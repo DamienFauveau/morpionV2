@@ -67,15 +67,45 @@ export class HomePage {
 			else
 				this.player = 'X';
 		}
+		console.log(this.player);
 	}
 
 	iaTurn() {
-		let rnd = Math.floor((Math.random()*8));
-		if(this.cellsEmpty()) {
-			while(this.squares[rnd]) {
-				rnd = Math.floor((Math.random()*8));
+		let rnd = 0;
+		const conditions = [
+		[0, 1, 2], [3, 4, 5], [6, 7, 8], // lignes
+		[0, 3, 6], [1, 4, 7], [2, 5, 8], // colonnes
+		[0, 4, 8], [2, 4, 6]             // diagonales
+		];
+		if(this.cellsEmpty()) { // si il reste des cases de libre
+			do {
+				rnd = Math.floor((Math.random()*8)); // nombre random
+				for (let condition of conditions) { // parcourt les cases qui completent une rangée pour contrer le joueur adverse
+					if ( this.squares[condition[0]] && this.squares[condition[0]] === this.squares[condition[1]] && this.squares[condition[1]] && !this.squares[condition[2]] && this.squares[condition[1]] != this.player) {
+						rnd = condition[2];
+					}
+					else if ( this.squares[condition[0]] && this.squares[condition[0]] === this.squares[condition[2]] && this.squares[condition[2]] && !this.squares[condition[1]] && this.squares[condition[2]] != this.player) {
+						rnd = condition[1];
+					}
+					else if ( this.squares[condition[1]] && this.squares[condition[1]] === this.squares[condition[2]] && this.squares[condition[2]] && !this.squares[condition[0]] && this.squares[condition[2]] != this.player) {
+						rnd = condition[0];
+					}
+				}
+
+				for (let condition of conditions) { // parcourt les cases qui completent une rangée pour faire gagner le joueur
+					if ( this.squares[condition[0]] && this.squares[condition[0]] === this.squares[condition[1]] && this.squares[condition[1]] && !this.squares[condition[2]] && this.squares[condition[1]] == this.player) {
+						rnd = condition[2];
+					}
+					else if ( this.squares[condition[0]] && this.squares[condition[0]] === this.squares[condition[2]] && this.squares[condition[2]] && !this.squares[condition[1]] && this.squares[condition[2]] == this.player) {
+						rnd = condition[1];
+					}
+					else if ( this.squares[condition[1]] && this.squares[condition[1]] === this.squares[condition[2]] && this.squares[condition[2]] && !this.squares[condition[0]] && this.squares[condition[2]] == this.player) {
+						rnd = condition[0];
+					}
+				}
 			}
-			setTimeout(() => this.handleMove(rnd), 500);
+			while(this.squares[rnd]); // tant que la case n'est pas vide on recommence
+			setTimeout(() => this.handleMove(rnd), 500); // on attend un peu avant de jouer
 		}
 	}
 
